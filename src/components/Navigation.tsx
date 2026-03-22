@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Home,
@@ -8,7 +9,6 @@ import {
   FileText,
   BarChart3,
   Settings,
-  Receipt,
   FileDown,
   BookOpen,
 } from "lucide-react";
@@ -32,19 +32,16 @@ export function Navigation() {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-64 min-h-screen fixed left-0 top-0 z-30 sidebar-gradient shadow-2xl">
         {/* Logo */}
-        <div className="px-6 py-7 border-b border-white/10">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl gradient-brand flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200 animate-pulse-soft">
-              <Receipt className="w-7 h-7 text-white" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold text-white leading-tight tracking-wide">
-                Receipt<span className="text-sky-300">Snap</span>
-              </span>
-              <span className="text-[10px] text-sky-200/80 font-light tracking-widest leading-tight mt-0.5">
-                証憑７年AI管理
-              </span>
-            </div>
+        <div className="px-6 py-6 border-b border-white/10">
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/logo.png"
+              alt="ReceiptSnap"
+              width={160}
+              height={48}
+              className="object-contain group-hover:opacity-90 transition-opacity duration-200"
+              priority
+            />
           </Link>
         </div>
 
