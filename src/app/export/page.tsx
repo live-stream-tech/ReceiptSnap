@@ -20,44 +20,45 @@ import { cn } from "@/lib/utils";
 const currentYear = new Date().getFullYear();
 const years = [currentYear, currentYear - 1, currentYear - 2];
 
-type Plan = "basic" | "complete";
+type Plan = "simple" | "complete";
 
 const PLANS = [
   {
-    id: "basic" as Plan,
-    name: "ベーシック",
+    id: "simple" as Plan,
+    name: "シンプル出力",
+    subname: "決算書のみ",
     price: 500,
-    description: "収支報告書・決算書（数字のみ）",
+    description: "国税庁フォーマット準拠の収支内訳書PDFを出力します",
     features: [
-      "収支内訳書PDF",
-      "青色申告決算書PDF",
-      "科目別集計表",
-      "1シーズン有効",
+      "収支内訳書PDF（国税庁フォーマット準拠）",
+      "科目別経費内訳",
+      "同一年度内は何度でも再出力可能",
     ],
     gradient: "from-sky-400 to-blue-600",
-    badge: null,
+    badge: "人気",
   },
   {
     id: "complete" as Plan,
-    name: "コンプリート",
+    name: "税務調査対応",
+    subname: "決算書＋証憑一覧",
     price: 1000,
-    description: "決算書＋書類まとめPDF（日付順）",
+    description: "決算書に加え、全書類を日付順に整理した証憑一覧を添付します",
     features: [
-      "ベーシックの全機能",
+      "シンプル出力の全機能",
       "アップロード書類を日付順に添付",
-      "科目別に整理されたPDF",
-      "税務調査対応の証憑一覧",
+      "税務調査にも対応できる証憑一覧PDF",
+      "同一年度内は何度でも再出力可能",
     ],
-    gradient: "from-teal-400 to-emerald-600",
-    badge: "おすすめ",
+    gradient: "from-violet-400 to-purple-600",
+    badge: "完全版",
   },
 ];
 
 export default function ExportPage() {
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [selectedPlan, setSelectedPlan] = useState<Plan>("complete");
+  const [selectedPlan, setSelectedPlan] = useState<Plan>("simple");
   const [step, setStep] = useState<"select" | "payment" | "generating" | "done">("select");
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "bank">("card");
+  const [paymentMethod, setPaymentMethod] = useState<"card">("card");
 
   const { getTotalIncome, getTotalExpense, getTotalByCategory, getReceiptsByYear } = useStore();
 
@@ -184,7 +185,7 @@ export default function ExportPage() {
             </div>
             <h2 className="text-2xl font-bold text-brand-900 mb-2">PDFのダウンロードが完了しました</h2>
             <p className="text-brand-600/50 text-sm mb-6">
-              {selectedYear}年度の{plan.name}プランのPDFが保存されました
+              {selectedYear}年度の{plan.name}（{plan.subname}）のPDFが保存されました
             </p>
             <button
               onClick={() => setStep("select")}
@@ -212,14 +213,16 @@ export default function ExportPage() {
 
           <div className="mb-8 animate-fade-up">
             <h1 className="text-3xl font-bold text-brand-900 tracking-wide">お支払い</h1>
-            <p className="text-brand-600/60 text-sm mt-1">{selectedYear}年度 {plan.name}プラン</p>
+            <p className="text-brand-600/60 text-sm mt-1">
+              {selectedYear}年度 {plan.name}（{plan.subname}）
+            </p>
           </div>
 
           {/* Order Summary */}
           <div className="card-glass rounded-2xl p-6 mb-5 animate-fade-up" style={{ animationDelay: "80ms" }}>
             <h2 className="font-bold text-brand-900 text-sm mb-4">ご注文内容</h2>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-brand-700">{plan.name}プラン（{selectedYear}年度）</span>
+              <span className="text-sm text-brand-700">{plan.name}（{selectedYear}年度）</span>
               <span className="text-sm font-bold text-brand-900">¥{plan.price.toLocaleString()}</span>
             </div>
             <div className="border-t border-sky-100 pt-3 flex items-center justify-between">
@@ -246,27 +249,9 @@ export default function ExportPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-brand-900">クレジットカード</p>
-                  <p className="text-xs text-brand-500/60">Visa / Mastercard / JCB</p>
+                  <p className="text-xs text-brand-500/60">Visa / Mastercard / JCB / AMEX</p>
                 </div>
                 {paymentMethod === "card" && <Check className="w-4 h-4 text-sky-500 ml-auto" />}
-              </button>
-              <button
-                onClick={() => setPaymentMethod("bank")}
-                className={cn(
-                  "w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left",
-                  paymentMethod === "bank"
-                    ? "border-sky-400 bg-sky-50"
-                    : "border-sky-100 hover:border-sky-300"
-                )}
-              >
-                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", paymentMethod === "bank" ? "gradient-sky" : "bg-sky-50")}>
-                  <Receipt className={cn("w-5 h-5", paymentMethod === "bank" ? "text-white" : "text-sky-400")} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-brand-900">口座振替</p>
-                  <p className="text-xs text-brand-500/60">銀行口座から直接引き落とし</p>
-                </div>
-                {paymentMethod === "bank" && <Check className="w-4 h-4 text-sky-500 ml-auto" />}
               </button>
             </div>
           </div>
@@ -301,6 +286,10 @@ export default function ExportPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fade-up">
+          <div className="flex items-center gap-2 text-sm text-sky-500 font-bold mb-4">
+            <FileDown className="w-4 h-4" />
+            <span>PDF出力</span>
+          </div>
           <h1 className="text-3xl font-bold text-brand-900 tracking-wide">決算書PDF出力</h1>
           <p className="text-brand-600/60 text-sm mt-1">プランを選択してPDFをダウンロードしてください</p>
         </div>
@@ -373,19 +362,23 @@ export default function ExportPage() {
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-brand-900">{p.name}</span>
                       {p.badge && (
-                        <span className="text-[10px] px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full font-semibold">
+                        <span className={cn(
+                          "text-[10px] px-2 py-0.5 rounded-full font-semibold",
+                          p.id === "simple" ? "bg-sky-100 text-sky-700" : "bg-violet-100 text-violet-700"
+                        )}>
                           {p.badge}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-brand-600/60 mt-0.5">{p.description}</p>
+                    <p className="text-xs text-brand-500/60 mt-0.5">{p.subname}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="text-xl font-bold text-brand-900">¥{p.price.toLocaleString()}</span>
-                  <p className="text-xs text-brand-500/50">/シーズン</p>
+                  <p className="text-xs text-brand-500/50">/ 回</p>
                 </div>
               </div>
+              <p className="text-xs text-brand-600/60 mb-3 pl-15">{p.description}</p>
               <ul className="space-y-1.5 pl-2">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-xs text-brand-700">
@@ -398,8 +391,26 @@ export default function ExportPage() {
           ))}
         </div>
 
+        {/* 7年保存プランへの誘導 */}
+        <div className="bg-teal-50 border border-teal-200 rounded-2xl p-5 mb-5 animate-fade-up" style={{ animationDelay: "400ms" }}>
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 bg-teal-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Receipt className="w-4 h-4 text-teal-600" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-teal-800 mb-1">毎年使うなら7年保存プランがお得</p>
+              <p className="text-xs text-teal-600/80 leading-relaxed">
+                年額¥2,500でPDF出力（両プラン）が何度でも使えます。2回以上使うなら年額プランの方がお得です。
+              </p>
+              <a href="/pricing" className="text-xs text-teal-700 font-bold mt-2 inline-block hover:underline">
+                プラン比較を見る →
+              </a>
+            </div>
+          </div>
+        </div>
+
         {/* Security Note */}
-        <div className="flex items-center gap-2 text-xs text-brand-500/50 mb-5 animate-fade-up" style={{ animationDelay: "400ms" }}>
+        <div className="flex items-center gap-2 text-xs text-brand-500/50 mb-5 animate-fade-up" style={{ animationDelay: "480ms" }}>
           <Lock className="w-3.5 h-3.5" />
           <span>ロボットペイメントによる安全な決済処理</span>
         </div>
@@ -407,10 +418,10 @@ export default function ExportPage() {
         <button
           onClick={handleProceedToPayment}
           className="w-full py-4 gradient-hero text-white rounded-2xl font-bold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 animate-fade-up"
-          style={{ animationDelay: "480ms" }}
+          style={{ animationDelay: "560ms" }}
         >
           <Sparkles className="w-5 h-5" />
-          {plan.name}プランで出力する（¥{plan.price.toLocaleString()}）
+          {plan.name}で出力する（¥{plan.price.toLocaleString()}）
         </button>
       </div>
     </MainLayout>
