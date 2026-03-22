@@ -7,89 +7,327 @@ import {
   FileText,
   BarChart3,
   FileDown,
-  CheckCircle,
-  Clock,
   ArrowRight,
-  TrendingUp,
-  TrendingDown,
-  Camera,
   Sparkles,
-  ShieldCheck,
   BookOpen,
   ChevronDown,
-  Image as ImageIcon,
+  Camera,
   Monitor,
+  Receipt,
 } from "lucide-react";
 
-// ─── サンプルPDFデータ ───────────────────────────────────────
+// ─── サンプルデータ ──────────────────────────────────────────
 const SAMPLE_RECEIPTS = [
-  { date: "2025-01-10", vendor: "〇〇株式会社（売上）",         amount: 350000, category: "売上",       type: "income" },
-  { date: "2025-01-15", vendor: "Amazon Japan",               amount: 12800,  category: "事務用品費", type: "expense" },
-  { date: "2025-01-20", vendor: "新幹線（東京→大阪）",          amount: 14520,  category: "旅費交通費", type: "expense" },
-  { date: "2025-02-05", vendor: "△△デザイン事務所（売上）",    amount: 280000, category: "売上",       type: "income" },
-  { date: "2025-02-12", vendor: "Adobe Creative Cloud",       amount: 6248,   category: "ソフトウェア", type: "expense" },
-  { date: "2025-02-18", vendor: "コーヒーショップ（打合せ）",   amount: 2400,   category: "交際費",     type: "expense" },
-  { date: "2025-03-01", vendor: "□□株式会社（売上）",          amount: 420000, category: "売上",       type: "income" },
-  { date: "2025-03-08", vendor: "レンタルオフィス 3月分",       amount: 22000,  category: "地代家賃",   type: "expense" },
+  { date: "2025-01-10", vendor: "〇〇株式会社",       amount: 350000, category: "売上",       type: "income"  },
+  { date: "2025-01-15", vendor: "Amazon Japan",       amount: 12800,  category: "消耗品費",   type: "expense" },
+  { date: "2025-01-20", vendor: "JR東海（新幹線）",   amount: 14520,  category: "旅費交通費", type: "expense" },
+  { date: "2025-02-05", vendor: "△△デザイン事務所",  amount: 280000, category: "売上",       type: "income"  },
+  { date: "2025-02-12", vendor: "Adobe CC",           amount: 6248,   category: "通信費",     type: "expense" },
+  { date: "2025-02-18", vendor: "カフェ（打合せ）",   amount: 2400,   category: "接待交際費", type: "expense" },
+  { date: "2025-03-01", vendor: "□□株式会社",        amount: 420000, category: "売上",       type: "income"  },
+  { date: "2025-03-08", vendor: "レンタルオフィス",   amount: 22000,  category: "地代家賃",   type: "expense" },
+  { date: "2025-03-15", vendor: "NTTドコモ",          amount: 3800,   category: "通信費",     type: "expense" },
+  { date: "2025-03-20", vendor: "〇〇株式会社（外注）", amount: 55000, category: "外注工賃",  type: "expense" },
 ];
 
 const totalIncome  = SAMPLE_RECEIPTS.filter(r => r.type === "income").reduce((s, r) => s + r.amount, 0);
 const totalExpense = SAMPLE_RECEIPTS.filter(r => r.type === "expense").reduce((s, r) => s + r.amount, 0);
 const profit       = totalIncome - totalExpense;
 
+// 国税庁フォーマットの経費科目（一般用）
+const NTA_CATEGORIES = [
+  "租税公課", "荷造運賃", "水道光熱費", "旅費交通費", "通信費",
+  "広告宣伝費", "接待交際費", "損害保険料", "修繕費", "消耗品費",
+  "減価償却費", "福利厚生費", "給料賃金", "外注工賃", "利子割引料",
+  "地代家賃", "貸倒金", "雑費",
+];
+
 const categoryTotals: Record<string, number> = {};
 SAMPLE_RECEIPTS.filter(r => r.type === "expense").forEach(r => {
   categoryTotals[r.category] = (categoryTotals[r.category] || 0) + r.amount;
 });
-const categoryList = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
-const maxCat = Math.max(...categoryList.map(([, v]) => v));
 
 const fmt = (n: number) => `¥${n.toLocaleString()}`;
+const fmtNum = (n: number) => n > 0 ? n.toLocaleString() : "";
 
 // ─── ステップ定義 ────────────────────────────────────────────
 const STEPS = [
   {
-    num: "1",
-    title: "書類をアップロード",
+    num: "1", title: "書類をアップロード",
     desc: "領収書・請求書の写真、スクリーンショット、PDFをアップロードします。",
-    icon: Upload,
-    color: "from-sky-400 to-blue-600",
-    bg: "bg-sky-50",
-    border: "border-sky-200",
-    numColor: "text-sky-500",
+    icon: Upload, color: "from-sky-400 to-blue-600",
+    bg: "bg-sky-50", border: "border-sky-200", numColor: "text-sky-400",
   },
   {
-    num: "2",
-    title: "情報を入力・確認",
+    num: "2", title: "情報を入力・確認",
     desc: "日付・取引先・金額・勘定科目を入力して登録。ステータスで確認状況を管理できます。",
-    icon: FileText,
-    color: "from-teal-400 to-emerald-600",
-    bg: "bg-teal-50",
-    border: "border-teal-200",
-    numColor: "text-teal-500",
+    icon: FileText, color: "from-teal-400 to-emerald-600",
+    bg: "bg-teal-50", border: "border-teal-200", numColor: "text-teal-400",
   },
   {
-    num: "3",
-    title: "収支をリアルタイム確認",
+    num: "3", title: "収支をリアルタイム確認",
     desc: "月別グラフ・科目別内訳が自動集計されます。経費率や利益をいつでも把握できます。",
-    icon: BarChart3,
-    color: "from-blue-400 to-indigo-600",
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    numColor: "text-blue-500",
+    icon: BarChart3, color: "from-blue-400 to-indigo-600",
+    bg: "bg-blue-50", border: "border-blue-200", numColor: "text-blue-400",
   },
   {
-    num: "4",
-    title: "決算書PDFを出力",
+    num: "4", title: "決算書PDFを出力",
     desc: "確定申告に必要な決算書をワンクリックで生成。証憑一覧も自動添付されます。",
-    icon: FileDown,
-    color: "from-violet-400 to-purple-600",
-    bg: "bg-violet-50",
-    border: "border-violet-200",
-    numColor: "text-violet-500",
+    icon: FileDown, color: "from-violet-400 to-purple-600",
+    bg: "bg-violet-50", border: "border-violet-200", numColor: "text-violet-400",
   },
 ];
 
+// ─── サンプルレシートコンポーネント ─────────────────────────
+function SampleReceipt() {
+  return (
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200 max-w-xs mx-auto">
+      {/* レシートヘッダー */}
+      <div className="bg-slate-800 px-4 py-3 text-center">
+        <p className="text-white font-bold text-sm tracking-widest">〇〇コーヒーショップ</p>
+        <p className="text-slate-400 text-[10px] mt-0.5">東京都渋谷区〇〇1-2-3</p>
+      </div>
+      {/* レシート本体 */}
+      <div className="px-5 py-4 font-mono text-xs">
+        <p className="text-slate-500 text-center mb-3 text-[10px]">2025年03月18日（火）14:32</p>
+        <div className="space-y-1.5 mb-3 pb-3 border-b border-dashed border-slate-200">
+          <div className="flex justify-between">
+            <span className="text-slate-700">ブレンドコーヒー</span>
+            <span className="text-slate-800 font-semibold">¥550</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-700">カフェラテ</span>
+            <span className="text-slate-800 font-semibold">¥660</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-700">チーズケーキ</span>
+            <span className="text-slate-800 font-semibold">¥580</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-700">アメリカーノ</span>
+            <span className="text-slate-800 font-semibold">¥610</span>
+          </div>
+        </div>
+        <div className="space-y-1 mb-3 pb-3 border-b border-dashed border-slate-200">
+          <div className="flex justify-between text-slate-500">
+            <span>小計</span>
+            <span>¥2,400</span>
+          </div>
+          <div className="flex justify-between text-slate-500">
+            <span>消費税（10%）</span>
+            <span>¥218</span>
+          </div>
+        </div>
+        <div className="flex justify-between font-bold text-slate-900 text-sm">
+          <span>合計</span>
+          <span>¥2,400</span>
+        </div>
+        <div className="mt-3 pt-3 border-t border-dashed border-slate-200 space-y-0.5 text-slate-400 text-[10px]">
+          <div className="flex justify-between">
+            <span>お預かり</span>
+            <span>¥3,000</span>
+          </div>
+          <div className="flex justify-between">
+            <span>お釣り</span>
+            <span>¥600</span>
+          </div>
+        </div>
+        <p className="text-center text-slate-400 text-[10px] mt-4">ありがとうございました</p>
+        <p className="text-center text-slate-300 text-[9px] mt-1">登録番号：T1234567890123</p>
+      </div>
+      {/* 科目タグ */}
+      <div className="bg-sky-50 px-4 py-2.5 flex items-center justify-between border-t border-sky-100">
+        <div className="flex items-center gap-1.5">
+          <Receipt className="w-3.5 h-3.5 text-sky-500" />
+          <span className="text-[11px] font-bold text-sky-700">接待交際費</span>
+        </div>
+        <span className="text-[11px] font-bold text-slate-700">¥2,400</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 国税庁フォーマット準拠の収支内訳書 ─────────────────────
+function NTAShushiNaiyakusho() {
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden border-2 border-slate-200 shadow-lg text-[11px] font-sans">
+      {/* PDFウィンドウバー */}
+      <div className="bg-slate-700 px-4 py-2.5 flex items-center gap-2.5">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+          <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+        </div>
+        <span className="text-slate-300 text-[10px]">収支内訳書（一般用）_2025年度.pdf</span>
+      </div>
+
+      <div className="p-5 bg-white">
+        {/* 書類タイトル */}
+        <div className="text-center mb-4 pb-3 border-b-2 border-slate-800">
+          <p className="text-[10px] text-slate-500 mb-0.5">令和7年分</p>
+          <h3 className="text-base font-bold text-slate-900 tracking-widest">収支内訳書（一般用）</h3>
+          <p className="text-[9px] text-slate-400 mt-0.5">※ 国税庁様式に基づくサンプルです</p>
+        </div>
+
+        {/* 事業者情報 */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-4 text-[10px]">
+          <div className="flex gap-2">
+            <span className="text-slate-500 w-16 flex-shrink-0">住所</span>
+            <span className="text-slate-700 border-b border-slate-200 flex-1">東京都渋谷区〇〇1-2-3</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-slate-500 w-16 flex-shrink-0">氏名</span>
+            <span className="text-slate-700 border-b border-slate-200 flex-1">山田 太郎</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-slate-500 w-16 flex-shrink-0">業種名</span>
+            <span className="text-slate-700 border-b border-slate-200 flex-1">フリーランス（ITコンサルタント）</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-slate-500 w-16 flex-shrink-0">屋号</span>
+            <span className="text-slate-700 border-b border-slate-200 flex-1">Yamada Consulting</span>
+          </div>
+        </div>
+
+        {/* 収入金額 */}
+        <div className="mb-3">
+          <div className="bg-slate-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-t-lg">
+            収入金額
+          </div>
+          <table className="w-full border border-slate-300 border-t-0 text-[10px]">
+            <tbody>
+              <tr className="border-b border-slate-200">
+                <td className="px-3 py-1.5 text-slate-600 bg-slate-50 border-r border-slate-200 w-48">
+                  ① 売上（収入）金額
+                </td>
+                <td className="px-3 py-1.5 text-right font-bold text-emerald-700">
+                  {fmtNum(totalIncome)}
+                </td>
+              </tr>
+              <tr className="border-b border-slate-200">
+                <td className="px-3 py-1.5 text-slate-600 bg-slate-50 border-r border-slate-200">
+                  ② 家事消費・事業消費
+                </td>
+                <td className="px-3 py-1.5 text-right text-slate-400">—</td>
+              </tr>
+              <tr className="bg-sky-50">
+                <td className="px-3 py-1.5 font-bold text-slate-700 bg-sky-100 border-r border-slate-200">
+                  ④ 収入金額計（①+②+③）
+                </td>
+                <td className="px-3 py-1.5 text-right font-bold text-slate-900">
+                  {fmtNum(totalIncome)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 経費 */}
+        <div className="mb-3">
+          <div className="bg-slate-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-t-lg">
+            経費
+          </div>
+          <table className="w-full border border-slate-300 border-t-0 text-[10px]">
+            <tbody>
+              {NTA_CATEGORIES.map((cat, i) => {
+                const amount = categoryTotals[cat] || 0;
+                return (
+                  <tr key={cat} className={`border-b border-slate-100 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}`}>
+                    <td className="px-3 py-1 text-slate-600 border-r border-slate-200 w-36">{cat}</td>
+                    <td className={`px-3 py-1 text-right ${amount > 0 ? "font-semibold text-slate-800" : "text-slate-300"}`}>
+                      {amount > 0 ? fmtNum(amount) : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+              <tr className="bg-sky-50 border-t-2 border-slate-300">
+                <td className="px-3 py-1.5 font-bold text-slate-700 bg-sky-100 border-r border-slate-200">
+                  経費計
+                </td>
+                <td className="px-3 py-1.5 text-right font-bold text-slate-900">
+                  {fmtNum(totalExpense)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 所得金額 */}
+        <div>
+          <div className="bg-slate-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-t-lg">
+            所得金額
+          </div>
+          <table className="w-full border border-slate-300 border-t-0 text-[10px]">
+            <tbody>
+              <tr className="border-b border-slate-200">
+                <td className="px-3 py-1.5 text-slate-600 bg-slate-50 border-r border-slate-200">
+                  専従者控除前の所得金額
+                </td>
+                <td className="px-3 py-1.5 text-right font-semibold text-slate-800">
+                  {fmtNum(profit)}
+                </td>
+              </tr>
+              <tr className="border-b border-slate-200">
+                <td className="px-3 py-1.5 text-slate-600 bg-slate-50 border-r border-slate-200">
+                  専従者控除額
+                </td>
+                <td className="px-3 py-1.5 text-right text-slate-400">—</td>
+              </tr>
+              <tr className="bg-emerald-50">
+                <td className="px-3 py-2 font-bold text-slate-800 bg-emerald-100 border-r border-slate-200 text-[11px]">
+                  所得金額（事業所得）
+                </td>
+                <td className="px-3 py-2 text-right font-bold text-emerald-700 text-[13px]">
+                  {fmtNum(profit)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p className="text-[9px] text-slate-400 mt-3 text-right">
+          ※ 電子帳簿保存法に基づき保管　　単位：円
+        </p>
+      </div>
+
+      {/* 証憑一覧セクション */}
+      <div className="border-t-2 border-dashed border-slate-200 p-5 bg-slate-50/50">
+        <p className="text-[10px] font-bold text-slate-600 mb-2 flex items-center gap-1.5">
+          <FileText className="w-3.5 h-3.5" />
+          添付：証憑一覧（コンプリートプランのみ）
+        </p>
+        <table className="w-full text-[10px] border-collapse">
+          <thead>
+            <tr className="bg-slate-100">
+              <th className="text-left px-2 py-1 text-slate-500 font-semibold border border-slate-200">日付</th>
+              <th className="text-left px-2 py-1 text-slate-500 font-semibold border border-slate-200">取引先</th>
+              <th className="text-left px-2 py-1 text-slate-500 font-semibold border border-slate-200">科目</th>
+              <th className="text-right px-2 py-1 text-slate-500 font-semibold border border-slate-200">金額</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SAMPLE_RECEIPTS.map((r, i) => (
+              <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                <td className="px-2 py-1 text-slate-600 border border-slate-100">{r.date}</td>
+                <td className="px-2 py-1 text-slate-700 border border-slate-100">{r.vendor}</td>
+                <td className="px-2 py-1 border border-slate-100">
+                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${r.type === "income" ? "bg-emerald-100 text-emerald-700" : "bg-sky-100 text-sky-700"}`}>
+                    {r.category}
+                  </span>
+                </td>
+                <td className={`px-2 py-1 text-right font-semibold border border-slate-100 ${r.type === "income" ? "text-emerald-700" : "text-slate-700"}`}>
+                  {r.type === "income" ? "+" : ""}{fmt(r.amount)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ─── メインページ ────────────────────────────────────────────
 export default function GuidePage() {
   return (
     <MainLayout>
@@ -110,9 +348,9 @@ export default function GuidePage() {
         <p className="text-xs font-bold text-brand-500/60 uppercase tracking-widest mb-3">対応ファイル形式</p>
         <div className="flex flex-wrap gap-3">
           {[
-            { icon: Camera,    label: "写真（JPG / PNG）",        color: "text-sky-500",    bg: "bg-sky-50" },
-            { icon: Monitor,   label: "スクリーンショット",        color: "text-teal-500",   bg: "bg-teal-50" },
-            { icon: ImageIcon, label: "PDF",                      color: "text-violet-500", bg: "bg-violet-50" },
+            { icon: Camera,    label: "写真（JPG / PNG）",  color: "text-sky-500",    bg: "bg-sky-50" },
+            { icon: Monitor,   label: "スクリーンショット", color: "text-teal-500",   bg: "bg-teal-50" },
+            { icon: FileDown,  label: "PDF",               color: "text-violet-500", bg: "bg-violet-50" },
           ].map(({ icon: Icon, label, color, bg }) => (
             <div key={label} className={`flex items-center gap-2 px-4 py-2.5 ${bg} rounded-xl border border-white/60`}>
               <Icon className={`w-4 h-4 ${color}`} />
@@ -123,17 +361,15 @@ export default function GuidePage() {
       </div>
 
       {/* Steps */}
-      <div className="mb-12">
+      <div className="mb-14">
         {STEPS.map(({ num, title, desc, icon: Icon, color, bg, border, numColor }, i) => (
           <div key={num} className="animate-fade-up" style={{ animationDelay: `${120 + i * 80}ms` }}>
-            {/* Step card */}
             <div className={`${bg} border-2 ${border} rounded-3xl p-6 md:p-8`}>
-              <div className="flex items-start gap-5">
-                {/* Big number */}
-                <div className="flex-shrink-0 text-center">
-                  <span className={`text-7xl font-black leading-none ${numColor} opacity-20 select-none`}>{num}</span>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <span className={`text-8xl font-black leading-none ${numColor} opacity-15 select-none block`}>{num}</span>
                 </div>
-                <div className="flex-1 pt-1">
+                <div className="flex-1 pt-2">
                   <div className="flex items-center gap-3 mb-2">
                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md`}>
                       <Icon className="w-5 h-5 text-white" />
@@ -144,23 +380,20 @@ export default function GuidePage() {
                 </div>
               </div>
             </div>
-
-            {/* Arrow between steps */}
             {i < STEPS.length - 1 && (
               <div className="flex justify-center py-3">
-                <ChevronDown className="w-8 h-8 text-brand-300" strokeWidth={1.5} />
+                <ChevronDown className="w-9 h-9 text-brand-300" strokeWidth={1.5} />
               </div>
             )}
           </div>
         ))}
       </div>
 
-      {/* ─── サンプルPDFプレビュー ─────────────────────────── */}
-      <div className="animate-fade-up" style={{ animationDelay: "480ms" }}>
-        {/* Section header */}
-        <div className="flex items-center gap-3 mb-5">
+      {/* ─── 仕上がりプレビューセクション ───────────────── */}
+      <div className="animate-fade-up" style={{ animationDelay: "500ms" }}>
+        <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center shadow-md">
-            <FileDown className="w-5 h-5 text-white" />
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
             <p className="text-xs font-bold text-violet-500 tracking-widest mb-0.5">STEP 4 の仕上がりイメージ</p>
@@ -168,104 +401,37 @@ export default function GuidePage() {
           </div>
         </div>
 
-        {/* Sample badge */}
-        <div className="flex items-center gap-2 mb-4">
+        {/* サンプルバッジ */}
+        <div className="mb-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">
             <Sparkles className="w-3 h-3" />
-            これはサンプルデータによるプレビューです
+            これはサンプルデータによるプレビューです。実際の入力データで生成されます。
           </span>
         </div>
 
-        {/* PDF mock */}
-        <div className="card-glass rounded-2xl overflow-hidden border-2 border-violet-100 shadow-lg">
-          {/* PDF header bar */}
-          <div className="bg-gradient-to-r from-slate-700 to-slate-800 px-5 py-3 flex items-center gap-3">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-400" />
-              <div className="w-3 h-3 rounded-full bg-yellow-400" />
-              <div className="w-3 h-3 rounded-full bg-green-400" />
-            </div>
-            <span className="text-xs text-slate-300 font-medium">収支内訳書_2025年度.pdf</span>
+        {/* 2カラム：レシートサンプル ＋ 収支内訳書 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* 左：レシートサンプル */}
+          <div>
+            <p className="text-xs font-bold text-brand-600/60 mb-3 flex items-center gap-1.5">
+              <Receipt className="w-3.5 h-3.5" />
+              登録する書類の例（レシート）
+            </p>
+            <SampleReceipt />
           </div>
 
-          {/* PDF content */}
-          <div className="bg-white p-6 md:p-8">
-            {/* Title */}
-            <div className="text-center mb-6 pb-4 border-b-2 border-slate-200">
-              <h3 className="text-lg font-bold text-slate-800 mb-1">収 支 内 訳 書</h3>
-              <p className="text-xs text-slate-500">2025年度（2025年1月1日〜2025年3月31日）</p>
-              <p className="text-xs text-slate-500 mt-0.5">事業者名：山田 太郎　　業種：フリーランス（IT・デザイン）</p>
-            </div>
-
-            {/* Summary table */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              {[
-                { label: "売上合計",   value: fmt(totalIncome),  color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
-                { label: "経費合計",   value: fmt(totalExpense), color: "text-sky-700",     bg: "bg-sky-50",     border: "border-sky-200" },
-                { label: "差引利益",   value: fmt(profit),       color: "text-violet-700",  bg: "bg-violet-50",  border: "border-violet-200" },
-              ].map(({ label, value, color, bg, border }) => (
-                <div key={label} className={`${bg} border ${border} rounded-xl p-3 text-center`}>
-                  <p className="text-[10px] text-slate-500 mb-1">{label}</p>
-                  <p className={`text-sm font-bold ${color}`}>{value}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Category breakdown */}
-            <div className="mb-6">
-              <p className="text-xs font-bold text-slate-600 mb-3">科目別経費内訳</p>
-              <div className="space-y-2">
-                {categoryList.map(([name, amount]) => (
-                  <div key={name} className="flex items-center gap-3">
-                    <span className="text-[11px] text-slate-600 w-28 flex-shrink-0">{name}</span>
-                    <div className="flex-1 bg-slate-100 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full bg-gradient-to-r from-sky-400 to-blue-500"
-                        style={{ width: `${(amount / maxCat) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-[11px] font-bold text-slate-700 w-20 text-right flex-shrink-0">{fmt(amount)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Receipt list */}
-            <div>
-              <p className="text-xs font-bold text-slate-600 mb-2">証憑一覧（抜粋）</p>
-              <table className="w-full text-[10px] border-collapse">
-                <thead>
-                  <tr className="bg-slate-50">
-                    <th className="text-left px-2 py-1.5 text-slate-500 font-semibold border border-slate-200">日付</th>
-                    <th className="text-left px-2 py-1.5 text-slate-500 font-semibold border border-slate-200">取引先</th>
-                    <th className="text-left px-2 py-1.5 text-slate-500 font-semibold border border-slate-200">科目</th>
-                    <th className="text-right px-2 py-1.5 text-slate-500 font-semibold border border-slate-200">金額</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {SAMPLE_RECEIPTS.map((r, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
-                      <td className="px-2 py-1.5 text-slate-600 border border-slate-100">{r.date}</td>
-                      <td className="px-2 py-1.5 text-slate-700 border border-slate-100">{r.vendor}</td>
-                      <td className="px-2 py-1.5 border border-slate-100">
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${r.type === "income" ? "bg-emerald-100 text-emerald-700" : "bg-sky-100 text-sky-700"}`}>
-                          {r.category}
-                        </span>
-                      </td>
-                      <td className={`px-2 py-1.5 text-right font-bold border border-slate-100 ${r.type === "income" ? "text-emerald-700" : "text-slate-700"}`}>
-                        {r.type === "income" ? "+" : ""}{fmt(r.amount)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="text-[9px] text-slate-400 mt-2 text-right">※ 電子帳簿保存法に基づき保管</p>
-            </div>
+          {/* 右：収支内訳書 */}
+          <div>
+            <p className="text-xs font-bold text-brand-600/60 mb-3 flex items-center gap-1.5">
+              <FileDown className="w-3.5 h-3.5" />
+              出力されるPDF（収支内訳書・国税庁様式）
+            </p>
+            <NTAShushiNaiyakusho />
           </div>
         </div>
 
         {/* CTA */}
-        <div className="mt-8 gradient-hero rounded-2xl p-7 text-white text-center hover-lift shadow-lg">
+        <div className="gradient-hero rounded-2xl p-7 text-white text-center hover-lift shadow-lg">
           <h2 className="text-xl font-bold mb-1">さっそく始めましょう</h2>
           <p className="text-sky-200 text-sm mb-5">最初の書類をアップロードして、確定申告の準備を始めてください。</p>
           <Link
