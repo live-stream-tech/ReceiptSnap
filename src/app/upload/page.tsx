@@ -39,7 +39,7 @@ export default function UploadPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
-  const [showQR, setShowQR] = useState(false);
+  const [showQR, setShowQR] = useState(true);
   const [QRCode, setQRCode] = useState<React.ComponentType<{ value: string; size: number; level: string; bgColor: string; fgColor: string; style?: React.CSSProperties }> | null>(null);
   const [form, setForm] = useState({
     date: new Date().toISOString().split("T")[0],
