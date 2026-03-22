@@ -37,16 +37,13 @@ const bottomNavItems = [
   { href: "/settings", label: "設定", icon: Settings, color: "from-slate-400 to-slate-600" },
 ];
 
-// モバイル用フラットリスト（全項目）
+// モバイル用ボトムナビ（設定はヘッダーに移動したので除外）
 const mobileNavItems = [
   { href: "/",        label: "ホーム",       icon: Home,       color: "from-sky-400 to-blue-500" },
-  { href: "/guide",   label: "使い方",       icon: BookOpen,   color: "from-amber-400 to-orange-500" },
-  { href: "/pricing", label: "料金",         icon: CreditCard, color: "from-rose-400 to-pink-500" },
   { href: "/upload",  label: "アップロード", icon: Upload,     color: "from-cyan-400 to-teal-500" },
   { href: "/receipts",label: "証憑一覧",     icon: FileText,   color: "from-teal-400 to-emerald-500" },
   { href: "/report",  label: "レポート",     icon: BarChart3,  color: "from-blue-400 to-indigo-500" },
   { href: "/export",  label: "PDF出力",      icon: FileDown,   color: "from-violet-400 to-purple-500" },
-  { href: "/settings",label: "設定",         icon: Settings,   color: "from-slate-400 to-slate-600" },
 ];
 
 function NavLink({ href, label, icon: Icon, color, indent = false }: {
@@ -169,9 +166,43 @@ export function Navigation() {
         </div>
       </aside>
 
+      {/* ── Mobile header ── */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-30">
+        <div className="card-glass border-b border-sky-100/60 flex items-center justify-between px-4 py-2.5">
+          {/* ロゴ */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="ReceiptSnap"
+              width={120}
+              height={36}
+              className="object-contain"
+              priority
+            />
+          </Link>
+
+          {/* 設定アイコン */}
+          <Link
+            href="/settings"
+            className={cn(
+              "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200",
+              pathname === "/settings"
+                ? "bg-gradient-to-br from-slate-400 to-slate-600 shadow-md"
+                : "bg-sky-50 hover:bg-sky-100"
+            )}
+            aria-label="設定"
+          >
+            <Settings className={cn(
+              "w-5 h-5",
+              pathname === "/settings" ? "text-white" : "text-slate-500"
+            )} />
+          </Link>
+        </div>
+      </header>
+
       {/* ── Mobile bottom navigation ── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 safe-area-bottom">
-        <div className="card-glass border-t border-sky-100 flex items-center justify-around px-1 py-2 overflow-x-auto">
+        <div className="card-glass border-t border-sky-100 flex items-center justify-around px-1 py-2">
           {mobileNavItems.map(({ href, label, icon: Icon, color }) => {
             const active = pathname === href;
             return (

@@ -22,7 +22,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <Navigation />
 
       {/* Main content */}
-      <main className="md:ml-64 pb-24 md:pb-8 relative z-10">
+      <main className="md:ml-64 pt-16 md:pt-0 pb-24 md:pb-8 relative z-10">
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
           {children}
         </div>
