@@ -9,9 +9,23 @@ import { Camera, FileText, ArrowRight, TrendingUp, TrendingDown } from "lucide-r
 const currentYear = new Date().getFullYear();
 
 export default function HomePage() {
-  const { receipts, getTotalIncome, getTotalExpense } = useStore();
+  const { receipts, isLoading, getTotalIncome, getTotalExpense } = useStore();
 
   const hasData = receipts.length > 0;
+
+  // ローディング中
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="flex items-center justify-center min-h-[75vh]">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-500 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm text-brand-400/60">読み込み中...</p>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
   const income = getTotalIncome(currentYear);
   const expense = getTotalExpense(currentYear);
   const recentReceipts = receipts.slice(0, 5);

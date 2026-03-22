@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 export default function ReceiptsPage() {
-  const { receipts, updateReceipt, deleteReceipt } = useStore();
+  const { receipts, isLoading, updateReceipt, deleteReceipt } = useStore();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState<DocumentCategory | "all">("all");
   const [filterStatus, setFilterStatus] = useState<DocumentStatus | "all">("all");
