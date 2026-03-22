@@ -32,6 +32,7 @@ export interface AppState {
   addReceipt: (receipt: Omit<Receipt, "id" | "createdAt">) => void;
   updateReceipt: (id: string, updates: Partial<Receipt>) => void;
   deleteReceipt: (id: string) => void;
+  clearAll: () => void;
   getReceiptsByYear: (year: number) => Receipt[];
   getTotalByCategory: (year: number) => Record<DocumentCategory, number>;
   getTotalIncome: (year: number) => number;
@@ -89,6 +90,10 @@ export const useStore = create<AppState>()(
         set((state) => ({
           receipts: state.receipts.filter((r) => r.id !== id),
         }));
+      },
+
+      clearAll: () => {
+        set({ receipts: [] });
       },
 
       getReceiptsByYear: (year) => {

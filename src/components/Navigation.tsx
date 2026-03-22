@@ -9,6 +9,8 @@ import {
   BarChart3,
   Settings,
   Receipt,
+  FileDown,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +19,8 @@ const navItems = [
   { href: "/upload",   label: "アップロード", icon: Upload,    color: "from-cyan-400 to-teal-500" },
   { href: "/receipts", label: "証憑一覧",     icon: FileText,  color: "from-teal-400 to-emerald-500" },
   { href: "/report",   label: "レポート",     icon: BarChart3, color: "from-blue-400 to-indigo-500" },
+  { href: "/export",   label: "PDF出力",      icon: FileDown,  color: "from-violet-400 to-purple-500" },
+  { href: "/guide",    label: "使い方",       icon: BookOpen,  color: "from-amber-400 to-orange-500" },
   { href: "/settings", label: "設定",         icon: Settings,  color: "from-slate-400 to-slate-600" },
 ];
 

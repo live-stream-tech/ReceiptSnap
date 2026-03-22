@@ -17,10 +17,21 @@ import {
 } from "lucide-react";
 
 export default function SettingsPage() {
-  const { receipts } = useStore();
+  const { receipts, clearAll } = useStore();
   const [businessName, setBusinessName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [saved, setSaved] = useState(false);
+  const [resetConfirm, setResetConfirm] = useState(false);
+
+  const handleReset = () => {
+    if (resetConfirm) {
+      clearAll();
+      setResetConfirm(false);
+    } else {
+      setResetConfirm(true);
+      setTimeout(() => setResetConfirm(false), 4000);
+    }
+  };
 
   const handleSave = () => {
     setSaved(true);
@@ -131,13 +142,23 @@ export default function SettingsPage() {
               </button>
             </div>
             <div className="border-t border-sky-100 pt-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-sm font-semibold text-brand-900">書類数</p>
                   <p className="text-xs text-brand-500/60 mt-0.5">登録済みの書類</p>
                 </div>
                 <span className="text-lg font-bold text-brand-700">{receipts.length}件</span>
               </div>
+              <button
+                onClick={handleReset}
+                className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all border-2 ${
+                  resetConfirm
+                    ? "border-red-400 bg-red-50 text-red-600"
+                    : "border-red-200 bg-white text-red-400 hover:border-red-400 hover:text-red-600"
+                }`}
+              >
+                {resetConfirm ? "⚠️ もう一度タップで全データを削除します" : "すべてのデータをリセット"}
+              </button>
             </div>
           </div>
         </div>
