@@ -49,16 +49,19 @@ export default function LPPage() {
           レシートもスクショもOK<br />
           もう手入力はいりません
         </p>
+        {/* 3分で完了バッジ */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-50 border border-sky-200 text-sky-600 text-sm font-bold mb-6">
+          <span>⏱️</span>
+          <span>3分で完了</span>
+        </div>
 
-        {/* CTA */}
+        {/* CTAボタン */}
         <Link
           href="/upload"
           className="inline-block w-full max-w-xs py-5 rounded-2xl bg-sky-500 text-white text-lg font-black text-center shadow-lg shadow-sky-200 active:scale-[0.98] transition-transform"
         >
-          無料で試す
+          今すぐ無料で試す
         </Link>
-
-        <p className="text-xs text-gray-300 mt-4">登録不要・クレカ不要</p>
 
         {/* スクロール誘導 */}
         <div className="absolute bottom-8 flex flex-col items-center gap-1 animate-bounce">
@@ -144,7 +147,7 @@ export default function LPPage() {
         <p className="text-2xl font-black text-white mb-3 leading-snug">
           まずは無料で<br />試してみてください
         </p>
-        <p className="text-sm text-sky-100 mb-10">登録不要・クレカ不要・今すぐ使える</p>
+        <p className="text-sm text-sky-100 mb-10">まずは1枚、撮るだけで試せます</p>
         <Link
           href="/upload"
           className="inline-block w-full max-w-xs py-5 rounded-2xl bg-white text-sky-500 text-lg font-black text-center shadow-lg active:scale-[0.98] transition-transform"
