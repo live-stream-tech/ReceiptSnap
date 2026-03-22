@@ -168,7 +168,7 @@ export function Navigation() {
 
       {/* ── Mobile header ── */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-30">
-        <div className="card-glass border-b border-sky-100/60 flex items-center justify-between px-4 py-2.5">
+        <div className="sidebar-gradient border-b border-white/10 flex items-center justify-between px-4 py-2.5">
           {/* ロゴ */}
           <Link href="/" className="flex items-center">
             <Image
@@ -188,14 +188,11 @@ export function Navigation() {
               "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200",
               pathname === "/settings"
                 ? "bg-gradient-to-br from-slate-400 to-slate-600 shadow-md"
-                : "bg-sky-50 hover:bg-sky-100"
+                : "bg-white/10 hover:bg-white/20"
             )}
             aria-label="設定"
           >
-            <Settings className={cn(
-              "w-5 h-5",
-              pathname === "/settings" ? "text-white" : "text-slate-500"
-            )} />
+            <Settings className="w-5 h-5 text-white" />
           </Link>
         </div>
       </header>
