@@ -65,10 +65,10 @@ export default function HomePage() {
   ];
 
   const features = [
-    { icon: ShieldCheck, label: "電子帳簿保存法対応",     color: "text-emerald-500", bg: "bg-emerald-50" },
-    { icon: Zap,         label: "AIで自動分類",           color: "text-sky-500",     bg: "bg-sky-50" },
-    { icon: Calendar,    label: "7年間クラウド保存",      color: "text-teal-500",    bg: "bg-teal-50" },
-    { icon: Sparkles,    label: "確定申告書類を自動生成", color: "text-blue-500",    bg: "bg-blue-50" },
+    { icon: ShieldCheck, label: "電子帳簿保存法対応",       color: "text-emerald-500", bg: "bg-emerald-50" },
+    { icon: Zap,         label: "写真・スクリーンショット・PDF対応", color: "text-sky-500",     bg: "bg-sky-50" },
+    { icon: Calendar,    label: "7年間クラウド保存",        color: "text-teal-500",    bg: "bg-teal-50" },
+    { icon: Sparkles,    label: "決算書PDFをワンクリック出力",   color: "text-blue-500",    bg: "bg-blue-50" },
   ];
 
   return (
