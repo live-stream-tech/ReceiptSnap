@@ -3,7 +3,7 @@ import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
 export const metadata: Metadata = {
-  title: "ReceiptSnap - 証憑管理・確定申告サポート",
+  title: "ReceiptSnap - 証憴７年AI管理",
   description:
     "フリーランス・個人事業主向けの証憑管理アプリ。領収書・請求書をアップロードして、決算書PDFを自動生成。電子帳簿保存法対応。",
   manifest: "/manifest.json",

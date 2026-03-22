@@ -2,6 +2,7 @@
 
 import { MainLayout } from "@/components/MainLayout";
 import Link from "next/link";
+import { QRCodeSVG } from "qrcode.react";
 import {
   Upload,
   FileText,
@@ -533,6 +534,69 @@ export default function GuidePage() {
               出力されるPDF（収支内訳書・国税庁様式）
             </p>
             <NTAShushiNaiyakusho />
+          </div>
+        </div>
+
+        {/* ─── スマホインストール QRコード ───────────────── */}
+        <div className="card-glass rounded-2xl p-6 mb-8">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-md">
+              <Smartphone className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-sky-500 tracking-widest mb-0.5">INSTALL ON MOBILE</p>
+              <h2 className="text-xl font-bold text-brand-900">スマホにインストールする</h2>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row gap-6 items-center">
+            {/* QRコード */}
+            <div className="flex-shrink-0 flex flex-col items-center gap-3">
+              <div className="bg-white p-4 rounded-2xl shadow-md border border-slate-100">
+                <QRCodeSVG
+                  value="https://receipt-snap-nine.vercel.app"
+                  size={160}
+                  bgColor="#ffffff"
+                  fgColor="#0ea5e9"
+                  level="M"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-[11px] text-brand-500/60 text-center">
+                receipt-snap-nine.vercel.app
+              </p>
+            </div>
+            {/* 手順 */}
+            <div className="flex-1">
+              <p className="text-sm text-brand-700/70 mb-4 leading-relaxed">
+                QRコードをスマホのカメラで読み取ると、ブラウザで開きます。そのままホーム画面に追加するとアプリのように起動できます。
+              </p>
+              <div className="space-y-3">
+                {/* iOS */}
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-800 text-white rounded-full"> iOS</span>
+                    <span className="text-xs font-semibold text-slate-700">Safariで開く</span>
+                  </div>
+                  <ol className="text-xs text-slate-600 space-y-1">
+                    <li className="flex gap-2"><span className="text-sky-500 font-bold">1.</span> 画面下部の共有ボタン（↑）をタップ</li>
+                    <li className="flex gap-2"><span className="text-sky-500 font-bold">2.</span>「ホーム画面に追加」をタップ</li>
+                    <li className="flex gap-2"><span className="text-sky-500 font-bold">3.</span>「追加」をタップして完了</li>
+                  </ol>
+                </div>
+                {/* Android */}
+                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-600 text-white rounded-full">Android</span>
+                    <span className="text-xs font-semibold text-slate-700">Chromeで開く</span>
+                  </div>
+                  <ol className="text-xs text-slate-600 space-y-1">
+                    <li className="flex gap-2"><span className="text-emerald-500 font-bold">1.</span> 右上のメニュー（⋮）をタップ</li>
+                    <li className="flex gap-2"><span className="text-emerald-500 font-bold">2.</span>「ホーム画面に追加」をタップ</li>
+                    <li className="flex gap-2"><span className="text-emerald-500 font-bold">3.</span>「追加」をタップして完了</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

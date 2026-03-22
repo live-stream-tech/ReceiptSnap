@@ -1,21 +1,21 @@
 {
-  "name": "ReceiptSnap - 証憑管理・確定申告サポート",
+  "name": "ReceiptSnap - 証憴７年AI管理",
   "short_name": "ReceiptSnap",
   "description": "フリーランス・個人事業主向けの証憑管理アプリ。電子帳簿保存法対応。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#ec4899",
+  "theme_color": "#0ea5e9",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
