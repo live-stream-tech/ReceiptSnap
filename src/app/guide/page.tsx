@@ -248,8 +248,8 @@ export default function GuidePage() {
           <span>使い方ガイド</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-brand-900 tracking-tight leading-tight mb-4">
-          領収書を撮るだけで<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-blue-600">確定申告が終わる。</span>
+          撮って、登録して、PDF出力。<br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-blue-600">それだけ。</span>
         </h1>
         <p className="text-lg text-brand-600/70 leading-relaxed max-w-xl">
           写真・スクリーンショット・PDFをアップロードするだけ。あとは自動で集計して、国税庁フォーマットの決算書PDFを出力します。
