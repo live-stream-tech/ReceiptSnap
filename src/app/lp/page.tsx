@@ -34,25 +34,31 @@ export default function LPPage() {
     <div className="min-h-screen bg-white text-gray-900 font-sans">
 
       {/* ── ① ファーストビュー ── */}
-      <section className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
+      <section className="flex flex-col items-center justify-center min-h-screen px-6 text-center relative">
         {/* ロゴ */}
-        <p className="text-sm font-bold text-sky-500 tracking-widest mb-8">ReceiptSnap</p>
+        <p className="text-sm font-bold text-sky-500 tracking-widest mb-10">ReceiptSnap</p>
 
         {/* メインコピー */}
-        <h1 className="text-4xl font-black leading-snug text-gray-900 mb-5">
-          撮るだけで<br />
-          <span className="text-sky-500">収支内訳書</span>が完成
+        <h1 className="text-4xl font-black leading-tight text-gray-900 mb-10">
+          確定申告で<br />
+          一番面倒な<br />
+          <span className="text-sky-500">決算書作成</span>を<br />
+          かんたんに。
         </h1>
 
-        {/* サブコピー */}
-        <p className="text-base text-gray-500 leading-relaxed mb-10">
-          レシートもスクショもOK<br />
-          もう手入力はいりません
-        </p>
-        {/* 3分で完了バッジ */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-50 border border-sky-200 text-sky-600 text-sm font-bold mb-6">
-          <span>⏱️</span>
-          <span>3分で完了</span>
+        {/* 5項目ポイント */}
+        <div className="flex flex-col gap-3 w-full max-w-xs mb-10 text-left">
+          {[
+            { num: "01", text: "撮るだけ" },
+            { num: "02", text: "3分で終わる" },
+            { num: "03", text: "手入力いらない" },
+            { num: "04", text: "書類まで完成" },
+          ].map(({ num, text }) => (
+            <div key={num} className="flex items-center gap-4">
+              <span className="text-xs font-black text-sky-400 w-6 flex-shrink-0">{num}</span>
+              <span className="text-base font-bold text-gray-800">{text}</span>
+            </div>
+          ))}
         </div>
 
         {/* CTAボタン */}
