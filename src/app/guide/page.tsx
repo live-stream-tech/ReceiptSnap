@@ -14,6 +14,13 @@ import {
   Camera,
   Monitor,
   Receipt,
+  Smartphone,
+  Laptop,
+  Wifi,
+  Zap,
+  Clock,
+  FolderOpen,
+  ShieldCheck,
 } from "lucide-react";
 
 // ─── サンプルデータ ──────────────────────────────────────────
@@ -75,6 +82,70 @@ const STEPS = [
     desc: "確定申告に必要な決算書をワンクリックで生成。証憑一覧も自動添付されます。",
     icon: FileDown, color: "from-violet-400 to-purple-600",
     bg: "bg-violet-50", border: "border-violet-200", numColor: "text-violet-400",
+  },
+];
+
+// ─── 便利さ訴求データ ────────────────────────────────────────
+const CONVENIENCES = [
+  {
+    icon: Smartphone,
+    title: "スマホで撮ってすぐ登録",
+    desc: "外出先でレシートを受け取ったら、その場でスマホのカメラで撮影してアップロード。財布の中で紙がぐちゃぐちゃになる前に記録できます。",
+    color: "from-sky-400 to-blue-500",
+    bg: "bg-sky-50",
+    border: "border-sky-100",
+    tag: "スマホ対応",
+    tagColor: "bg-sky-100 text-sky-700",
+  },
+  {
+    icon: Laptop,
+    title: "PCでまとめて整理",
+    desc: "帰宅後はPCのブラウザで一覧を確認・編集。大きな画面で月ごとの収支をチェックしながら、漏れがないか確認できます。",
+    color: "from-teal-400 to-emerald-500",
+    bg: "bg-teal-50",
+    border: "border-teal-100",
+    tag: "PC対応",
+    tagColor: "bg-teal-100 text-teal-700",
+  },
+  {
+    icon: Monitor,
+    title: "スクリーンショットもそのままOK",
+    desc: "ネットショッピングの注文確認メールや、オンラインサービスの請求画面をスクリーンショットで保存してアップロードするだけ。印刷不要です。",
+    color: "from-violet-400 to-purple-500",
+    bg: "bg-violet-50",
+    border: "border-violet-100",
+    tag: "スクショ対応",
+    tagColor: "bg-violet-100 text-violet-700",
+  },
+  {
+    icon: Wifi,
+    title: "どこからでもアクセス",
+    desc: "データはクラウドに保存されるため、スマホで登録した書類をPCで確認、自宅でも外出先でも同じデータにアクセスできます。",
+    color: "from-blue-400 to-indigo-500",
+    bg: "bg-blue-50",
+    border: "border-blue-100",
+    tag: "クラウド保存",
+    tagColor: "bg-blue-100 text-blue-700",
+  },
+  {
+    icon: Clock,
+    title: "確定申告の直前に焦らない",
+    desc: "1年分の書類を3月にまとめて整理するのは大変です。ReceiptSnapなら日々少しずつ登録しておけば、申告期間に慌てる必要がありません。",
+    color: "from-amber-400 to-orange-500",
+    bg: "bg-amber-50",
+    border: "border-amber-100",
+    tag: "時短",
+    tagColor: "bg-amber-100 text-amber-700",
+  },
+  {
+    icon: ShieldCheck,
+    title: "電子帳簿保存法にも対応",
+    desc: "2024年から義務化された電子帳簿保存法。紙の領収書を捨てられる要件を満たした形式で保存するため、紙の管理から解放されます。",
+    color: "from-emerald-400 to-green-500",
+    bg: "bg-emerald-50",
+    border: "border-emerald-100",
+    tag: "電帳法対応",
+    tagColor: "bg-emerald-100 text-emerald-700",
   },
 ];
 
@@ -389,8 +460,43 @@ export default function GuidePage() {
         ))}
       </div>
 
+      {/* ─── 便利さ訴求セクション ───────────────────────── */}
+      <div className="mb-14 animate-fade-up" style={{ animationDelay: "480ms" }}>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-md">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-sky-500 tracking-widest mb-0.5">WHY RECEIPTSNAP</p>
+            <h2 className="text-xl font-bold text-brand-900">こんなときに便利</h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {CONVENIENCES.map(({ icon: Icon, title, desc, color, bg, border, tag, tagColor }, i) => (
+            <div
+              key={title}
+              className={`${bg} border ${border} rounded-2xl p-5 hover-lift`}
+              style={{ animationDelay: `${500 + i * 60}ms` }}
+            >
+              <div className="flex items-start gap-4">
+                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-md flex-shrink-0`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <h3 className="text-sm font-bold text-brand-900">{title}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tagColor}`}>{tag}</span>
+                  </div>
+                  <p className="text-xs text-brand-700/70 leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* ─── 仕上がりプレビューセクション ───────────────── */}
-      <div className="animate-fade-up" style={{ animationDelay: "500ms" }}>
+      <div className="animate-fade-up" style={{ animationDelay: "700ms" }}>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center shadow-md">
             <Sparkles className="w-5 h-5 text-white" />
