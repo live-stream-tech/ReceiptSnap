@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MainLayout } from "@/components/MainLayout";
+import { MainLayout, showToast } from "@/components/MainLayout";
 import { useStore, CATEGORIES, type DocumentCategory, type DocumentStatus } from "@/store";
 import {
   formatCurrency,
@@ -47,13 +47,14 @@ export default function ReceiptsPage() {
 
   const totalAmount = filtered.reduce((sum, r) => sum + r.amount, 0);
 
-  const handleStatusChange = (id: string, status: DocumentStatus) => {
-    updateReceipt(id, { status });
+  const handleStatusChange = async (id: string, status: DocumentStatus) => {
+    await updateReceipt(id, { status });
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("この書類を削除しますか？")) {
-      deleteReceipt(id);
+      await deleteReceipt(id);
+      showToast("削除しました", "info");
     }
   };
 

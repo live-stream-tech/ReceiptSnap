@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MainLayout } from "@/components/MainLayout";
+import { MainLayout, showToast } from "@/components/MainLayout";
 import { useStore, CATEGORIES, type DocumentCategory } from "@/store";
 import { useRouter } from "next/navigation";
 import {
@@ -77,33 +77,36 @@ export default function UploadPage() {
     if (file) handleFile(file);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.vendor.trim()) {
       setError("取引先を入力してください");
+      showToast("取引先を入力してください", "error");
       return;
     }
     if (!form.amount || isNaN(Number(form.amount))) {
       setError("金額を正しく入力してください");
+      showToast("金額を正しく入力してください", "error");
       return;
     }
     setError("");
-
-    addReceipt({
-      date: form.date,
-      vendor: form.vendor,
-      amount: Number(form.amount),
-      category: form.category,
-      note: form.note,
-      status: form.status,
-      imageUrl: preview || undefined,
-      fileName: fileName || undefined,
-    });
-
-    setSubmitted(true);
-    setTimeout(() => {
-      router.push("/receipts");
-    }, 1500);
+    try {
+      await addReceipt({
+        date: form.date,
+        vendor: form.vendor,
+        amount: Number(form.amount),
+        category: form.category,
+        note: form.note,
+        status: form.status,
+        imageUrl: preview || undefined,
+        fileName: fileName || undefined,
+      });
+      showToast("登録しました", "success");
+      setSubmitted(true);
+      setTimeout(() => { router.push("/receipts"); }, 1500);
+    } catch {
+      showToast("保存に失敗しました。もう一度お試しください", "error");
+    }
   };
 
   if (submitted) {

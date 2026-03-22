@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MainLayout } from "@/components/MainLayout";
+import { MainLayout, showToast } from "@/components/MainLayout";
 import { useStore } from "@/store";
 import {
   Building2,
@@ -23,9 +23,10 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (resetConfirm) {
-      clearAll();
+      await clearAll();
+      showToast("全データを削除しました", "info");
       setResetConfirm(false);
     } else {
       setResetConfirm(true);
