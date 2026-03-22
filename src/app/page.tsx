@@ -10,8 +10,11 @@ import {
   FileText,
   Clock,
   Upload,
-  ChevronRight,
+  ArrowRight,
   Sparkles,
+  ShieldCheck,
+  Zap,
+  Calendar,
 } from "lucide-react";
 
 const currentYear = new Date().getFullYear();
@@ -23,9 +26,7 @@ export default function HomePage() {
   const expense = getTotalExpense(currentYear);
   const profit = income - expense;
   const pendingCount = receipts.filter((r) => r.status === "pending").length;
-  const yearReceipts = receipts.filter((r) =>
-    r.date.startsWith(String(currentYear))
-  );
+  const yearReceipts = receipts.filter((r) => r.date.startsWith(String(currentYear)));
   const recentReceipts = receipts.slice(0, 5);
 
   const summaryCards = [
@@ -33,176 +34,188 @@ export default function HomePage() {
       label: "売上合計",
       value: formatCurrency(income),
       icon: TrendingUp,
-      gradient: "gradient-card-green",
+      gradient: "from-sky-400 to-blue-600",
       sub: `${currentYear}年度`,
+      delay: "0ms",
     },
     {
       label: "経費合計",
       value: formatCurrency(expense),
       icon: TrendingDown,
-      gradient: "gradient-card-pink",
+      gradient: "from-cyan-400 to-teal-600",
       sub: `${currentYear}年度`,
+      delay: "80ms",
     },
     {
       label: "書類数",
       value: `${yearReceipts.length}件`,
       icon: FileText,
-      gradient: "gradient-card-blue",
+      gradient: "from-teal-400 to-emerald-600",
       sub: `${currentYear}年度`,
+      delay: "160ms",
     },
     {
       label: "確認待ち",
       value: `${pendingCount}件`,
       icon: Clock,
-      gradient: "gradient-card-purple",
+      gradient: "from-blue-400 to-indigo-600",
       sub: "要確認",
+      delay: "240ms",
     },
+  ];
+
+  const features = [
+    { icon: ShieldCheck, label: "電子帳簿保存法対応",     color: "text-emerald-500", bg: "bg-emerald-50" },
+    { icon: Zap,         label: "AIで自動分類",           color: "text-sky-500",     bg: "bg-sky-50" },
+    { icon: Calendar,    label: "7年間クラウド保存",      color: "text-teal-500",    bg: "bg-teal-50" },
+    { icon: Sparkles,    label: "確定申告書類を自動生成", color: "text-blue-500",    bg: "bg-blue-50" },
   ];
 
   return (
     <MainLayout>
-      <div className="p-4 md:p-8 max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-5 h-5 text-brand-500" />
-            <span className="text-sm font-medium text-brand-600">
-              {currentYear}年度
-            </span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            ダッシュボード
-          </h1>
-          <p className="text-gray-500 mt-1 text-sm">
-            証憑の管理状況と収支サマリー
-          </p>
+      {/* Header */}
+      <div className="mb-8 animate-fade-up">
+        <div className="flex items-center gap-2 text-sm text-sky-500 font-medium mb-1">
+          <Calendar className="w-4 h-4" />
+          <span>{currentYear}年度</span>
         </div>
+        <h1 className="text-3xl font-bold text-brand-900 tracking-wide">ダッシュボード</h1>
+        <p className="text-brand-600/60 mt-1 text-sm">証憑の管理状況と収支サマリー</p>
+      </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          {summaryCards.map(({ label, value, icon: Icon, gradient, sub }) => (
-            <div
-              key={label}
-              className={`${gradient} rounded-2xl p-4 text-white shadow-sm`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium opacity-90">{label}</span>
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Icon className="w-4 h-4" />
-                </div>
-              </div>
-              <p className="text-xl font-bold leading-tight">{value}</p>
-              <p className="text-xs opacity-75 mt-1">{sub}</p>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {summaryCards.map(({ label, value, icon: Icon, gradient, sub, delay }) => (
+          <div
+            key={label}
+            className="card-glass rounded-2xl p-5 hover-lift animate-fade-up"
+            style={{ animationDelay: delay }}
+          >
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-md`}>
+              <Icon className="w-6 h-6 text-white" />
             </div>
-          ))}
-        </div>
-
-        {/* Profit Banner */}
-        {income > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">
-                  {currentYear}年度 収支差引
-                </p>
-                <p
-                  className={`text-3xl font-bold ${profit >= 0 ? "text-green-600" : "text-red-500"}`}
-                >
-                  {formatCurrency(profit)}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-gray-400">経費率</p>
-                <p className="text-2xl font-bold text-gray-700">
-                  {income > 0 ? Math.round((expense / income) * 100) : 0}%
-                </p>
-              </div>
-            </div>
+            <p className="text-xs text-brand-600/60 font-medium mb-1">{label}</p>
+            <p className="text-2xl font-bold text-brand-900 leading-tight">{value}</p>
+            <p className="text-xs text-brand-500/60 mt-1">{sub}</p>
           </div>
-        )}
+        ))}
+      </div>
 
-        {/* Quick Upload CTA */}
-        <Link
-          href="/upload"
-          className="block bg-gradient-to-r from-brand-500 to-purple-600 rounded-2xl p-5 mb-6 shadow-sm hover:shadow-md transition-shadow"
+      {/* Profit Banner */}
+      {income > 0 && (
+        <div
+          className="card-glass rounded-2xl p-6 mb-6 animate-fade-up"
+          style={{ animationDelay: "320ms" }}
         >
-          <div className="flex items-center justify-between text-white">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <Upload className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="font-semibold">書類をアップロード</p>
-                <p className="text-xs opacity-80">
-                  領収書・請求書を登録する
-                </p>
-              </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-brand-600/60 mb-1">{currentYear}年度 収支差引</p>
+              <p className={`text-3xl font-bold ${profit >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                {formatCurrency(profit)}
+              </p>
             </div>
-            <ChevronRight className="w-5 h-5 opacity-80" />
+            <div className="text-right">
+              <p className="text-xs text-brand-500/50">経費率</p>
+              <p className="text-2xl font-bold text-brand-700">
+                {income > 0 ? Math.round((expense / income) * 100) : 0}%
+              </p>
+            </div>
           </div>
-        </Link>
+        </div>
+      )}
 
-        {/* Recent Receipts */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
-            <h2 className="font-semibold text-gray-900">最近の書類</h2>
+      {/* Upload CTA */}
+      <Link
+        href="/upload"
+        className="block mb-8 animate-fade-up"
+        style={{ animationDelay: "400ms" }}
+      >
+        <div className="gradient-hero rounded-2xl p-6 flex items-center justify-between group hover-lift shadow-lg">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <Upload className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-white font-bold text-lg leading-tight">書類をアップロード</p>
+              <p className="text-sky-200 text-sm mt-0.5">領収書・請求書を登録する</p>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-white/70 group-hover:translate-x-1 transition-transform duration-200" />
+        </div>
+      </Link>
+
+      {/* Feature pills */}
+      <div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8 animate-fade-up"
+        style={{ animationDelay: "480ms" }}
+      >
+        {features.map(({ icon: Icon, label, color, bg }) => (
+          <div key={label} className={`${bg} rounded-xl px-4 py-3 flex items-center gap-3 border border-white/60`}>
+            <Icon className={`w-5 h-5 ${color} flex-shrink-0`} />
+            <span className="text-xs font-medium text-brand-800">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent Documents */}
+      <div
+        className="card-glass rounded-2xl overflow-hidden animate-fade-up"
+        style={{ animationDelay: "560ms" }}
+      >
+        <div className="flex items-center justify-between px-6 py-5 border-b border-sky-100/60">
+          <h2 className="text-lg font-bold text-brand-900">最近の書類</h2>
+          <Link
+            href="/receipts"
+            className="text-sm text-brand-500 hover:text-brand-700 font-medium flex items-center gap-1 transition-colors"
+          >
+            すべて見る <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {recentReceipts.length === 0 ? (
+          <div className="text-center py-14">
+            <div className="w-20 h-20 bg-sky-50 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
+              <FileText className="w-10 h-10 text-sky-300" />
+            </div>
+            <p className="text-brand-600/50 text-sm mb-4">書類がまだありません</p>
             <Link
-              href="/receipts"
-              className="text-sm text-brand-500 font-medium flex items-center gap-1 hover:text-brand-600"
+              href="/upload"
+              className="inline-flex items-center gap-2 text-sm text-brand-500 hover:text-brand-700 font-medium transition-colors"
             >
-              すべて見る
-              <ChevronRight className="w-4 h-4" />
+              最初の書類をアップロード <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-
-          {recentReceipts.length === 0 ? (
-            <div className="py-12 text-center">
-              <FileText className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-400 text-sm">書類がまだありません</p>
-              <Link
-                href="/upload"
-                className="mt-3 inline-block text-sm text-brand-500 font-medium hover:text-brand-600"
+        ) : (
+          <div className="divide-y divide-sky-50">
+            {recentReceipts.map((receipt) => (
+              <div
+                key={receipt.id}
+                className="flex items-center gap-4 px-6 py-4 hover:bg-sky-50/40 transition-colors group"
               >
-                最初の書類をアップロード →
-              </Link>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-50">
-              {recentReceipts.map((receipt) => (
-                <div
-                  key={receipt.id}
-                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {receipt.vendor || "取引先未設定"}
-                      </p>
-                      <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${getCategoryColor(receipt.category)}`}
-                      >
-                        {receipt.category}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400">
-                      {formatDateShort(receipt.date)}
+                <div className="w-11 h-11 rounded-xl gradient-sky flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <FileText className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <p className="text-sm font-medium text-brand-900 truncate">
+                      {receipt.vendor || "取引先未設定"}
                     </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-sm font-semibold text-gray-900">
-                      {formatCurrency(receipt.amount)}
-                    </p>
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${getStatusColor(receipt.status)}`}
-                    >
-                      {getStatusLabel(receipt.status)}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getCategoryColor(receipt.category)}`}>
+                      {receipt.category}
                     </span>
                   </div>
+                  <p className="text-xs text-brand-500/50">{formatDateShort(receipt.date)}</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-sm font-bold text-brand-700">{formatCurrency(receipt.amount)}</p>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getStatusColor(receipt.status)}`}>
+                    {getStatusLabel(receipt.status)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </MainLayout>
   );

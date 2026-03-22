@@ -11,6 +11,7 @@ import {
   X,
   Check,
   ChevronDown,
+  CloudUpload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ export default function UploadPage() {
 
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
+  const [isDragging, setIsDragging] = useState(false);
   const [form, setForm] = useState({
     date: new Date().toISOString().split("T")[0],
     vendor: "",
@@ -80,14 +82,12 @@ export default function UploadPage() {
     return (
       <MainLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-green-600" />
+          <div className="text-center animate-fade-up">
+            <div className="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-md">
+              <Check className="w-10 h-10 text-emerald-500" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              登録完了しました
-            </h2>
-            <p className="text-gray-500 text-sm">証憑一覧に移動します...</p>
+            <h2 className="text-2xl font-bold text-brand-900 mb-2">登録完了しました</h2>
+            <p className="text-brand-600/50 text-sm">証憑一覧に移動します...</p>
           </div>
         </div>
       </MainLayout>
@@ -96,29 +96,27 @@ export default function UploadPage() {
 
   return (
     <MainLayout>
-      <div className="p-4 md:p-8 max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">書類をアップロード</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            領収書・請求書を登録してください
-          </p>
+        <div className="mb-8 animate-fade-up">
+          <h1 className="text-3xl font-bold text-brand-900 tracking-wide">書類をアップロード</h1>
+          <p className="text-brand-600/60 mt-1 text-sm">領収書・請求書を登録してください</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* File Upload Area */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-50">
-              <h2 className="font-semibold text-gray-900 text-sm">書類ファイル</h2>
+          <div className="card-glass rounded-2xl overflow-hidden animate-fade-up" style={{ animationDelay: "80ms" }}>
+            <div className="px-6 py-4 border-b border-sky-100/60">
+              <h2 className="font-bold text-brand-900 text-sm">書類ファイル</h2>
             </div>
-            <div className="p-4">
+            <div className="p-6">
               {preview ? (
                 <div className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={preview}
                     alt="プレビュー"
-                    className="w-full max-h-48 object-contain rounded-xl bg-gray-50"
+                    className="w-full max-h-56 object-contain rounded-xl bg-sky-50"
                   />
                   <button
                     type="button"
@@ -126,46 +124,48 @@ export default function UploadPage() {
                       setPreview(null);
                       setFileName("");
                     }}
-                    className="absolute top-2 right-2 w-7 h-7 bg-gray-900/60 rounded-full flex items-center justify-center text-white hover:bg-gray-900/80 transition-colors"
+                    className="absolute top-2 right-2 w-8 h-8 bg-brand-900/60 rounded-full flex items-center justify-center text-white hover:bg-brand-900/80 transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
-                  <p className="text-xs text-gray-400 mt-2 text-center truncate">
-                    {fileName}
-                  </p>
+                  <p className="text-xs text-brand-500/50 mt-2 text-center truncate">{fileName}</p>
                 </div>
               ) : (
                 <div
                   onDrop={handleDrop}
-                  onDragOver={(e) => e.preventDefault()}
-                  className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-brand-300 transition-colors cursor-pointer"
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  className={cn(
+                    "border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200",
+                    isDragging
+                      ? "border-sky-400 bg-sky-50"
+                      : "border-sky-200 hover:border-sky-400 hover:bg-sky-50/50"
+                  )}
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Upload className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-600">
-                    ファイルをドラッグ＆ドロップ
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    または下のボタンから選択
-                  </p>
+                  <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <CloudUpload className="w-8 h-8 text-sky-400" />
+                  </div>
+                  <p className="text-sm font-medium text-brand-700">ファイルをドラッグ＆ドロップ</p>
+                  <p className="text-xs text-brand-500/50 mt-1">または下のボタンから選択</p>
                 </div>
               )}
 
-              <div className="flex gap-2 mt-3">
+              <div className="flex gap-3 mt-4">
                 <button
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-sky-200 text-sm font-medium text-brand-700 hover:bg-sky-50 transition-colors"
                 >
-                  <Camera className="w-4 h-4 text-brand-500" />
+                  <Camera className="w-5 h-5 text-sky-500" />
                   カメラで撮影
                 </button>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-sky-200 text-sm font-medium text-brand-700 hover:bg-sky-50 transition-colors"
                 >
-                  <ImageIcon className="w-4 h-4 text-brand-500" />
+                  <ImageIcon className="w-5 h-5 text-sky-500" />
                   ファイルを選択
                 </button>
               </div>
@@ -195,14 +195,14 @@ export default function UploadPage() {
           </div>
 
           {/* Form Fields */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-50">
-              <h2 className="font-semibold text-gray-900 text-sm">書類情報</h2>
+          <div className="card-glass rounded-2xl overflow-hidden animate-fade-up" style={{ animationDelay: "160ms" }}>
+            <div className="px-6 py-4 border-b border-sky-100/60">
+              <h2 className="font-bold text-brand-900 text-sm">書類情報</h2>
             </div>
-            <div className="p-4 space-y-4">
+            <div className="p-6 space-y-5">
               {/* Date */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                <label className="block text-xs font-semibold text-brand-700 mb-2">
                   日付 <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -210,13 +210,13 @@ export default function UploadPage() {
                   value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                   required
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-xl border border-sky-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent bg-white/80"
                 />
               </div>
 
               {/* Vendor */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                <label className="block text-xs font-semibold text-brand-700 mb-2">
                   取引先・店舗名 <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -225,70 +225,57 @@ export default function UploadPage() {
                   onChange={(e) => setForm({ ...form, vendor: e.target.value })}
                   placeholder="例：Amazon、コンビニ、〇〇株式会社"
                   required
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-xl border border-sky-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent bg-white/80"
                 />
               </div>
 
               {/* Amount */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                <label className="block text-xs font-semibold text-brand-700 mb-2">
                   金額（円） <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-                    ¥
-                  </span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-500 text-sm font-medium">¥</span>
                   <input
                     type="number"
                     value={form.amount}
-                    onChange={(e) =>
-                      setForm({ ...form, amount: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, amount: e.target.value })}
                     placeholder="0"
                     required
                     min="0"
-                    className="w-full pl-7 pr-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-3 rounded-xl border border-sky-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent bg-white/80"
                   />
                 </div>
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                <label className="block text-xs font-semibold text-brand-700 mb-2">
                   勘定科目 <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
                   <select
                     value={form.category}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        category: e.target.value as DocumentCategory,
-                      })
-                    }
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent appearance-none bg-white"
+                    onChange={(e) => setForm({ ...form, category: e.target.value as DocumentCategory })}
+                    className="w-full px-4 py-3 rounded-xl border border-sky-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent appearance-none bg-white/80"
                   >
                     {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
+                      <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-400 pointer-events-none" />
                 </div>
               </div>
 
               {/* Note */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  メモ（任意）
-                </label>
+                <label className="block text-xs font-semibold text-brand-700 mb-2">メモ（任意）</label>
                 <textarea
                   value={form.note}
                   onChange={(e) => setForm({ ...form, note: e.target.value })}
                   placeholder="備考・詳細など"
                   rows={2}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-sky-200 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent resize-none bg-white/80"
                 />
               </div>
             </div>
@@ -296,7 +283,7 @@ export default function UploadPage() {
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 animate-fade-up">
               <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
@@ -304,10 +291,8 @@ export default function UploadPage() {
           {/* Submit */}
           <button
             type="submit"
-            className={cn(
-              "w-full py-3.5 rounded-2xl font-semibold text-white text-sm transition-all",
-              "gradient-brand shadow-sm hover:shadow-md active:scale-[0.98]"
-            )}
+            className="w-full py-4 rounded-2xl font-bold text-white text-sm transition-all gradient-hero shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] animate-fade-up"
+            style={{ animationDelay: "240ms" }}
           >
             書類を登録する
           </button>
