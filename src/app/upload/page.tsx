@@ -14,6 +14,8 @@ import {
   CloudUpload,
   Smartphone,
   QrCode,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +39,9 @@ export default function UploadPage() {
   const isDesktop = useIsDesktop();
 
   const [preview, setPreview] = useState<string | null>(null);
+  const [previewMime, setPreviewMime] = useState<string>("image/jpeg");
   const [fileName, setFileName] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [showQR, setShowQR] = useState(true);
   const [QRCode, setQRCode] = useState<React.ComponentType<{ value: string; size: number; level: string; bgColor: string; fgColor: string; style?: React.CSSProperties }> | null>(null);
@@ -66,9 +70,43 @@ export default function UploadPage() {
   const handleFile = (file: File) => {
     if (!file) return;
     setFileName(file.name);
+    setPreviewMime(file.type || "image/jpeg");
     const reader = new FileReader();
     reader.onload = (e) => setPreview(e.target?.result as string);
     reader.readAsDataURL(file);
+  };
+
+  // AI読み取り
+  const handleAnalyze = async () => {
+    if (!preview) return;
+    setIsAnalyzing(true);
+    try {
+      const base64 = preview.split(",")[1];
+      const res = await fetch("/api/ocr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageBase64: base64, mimeType: previewMime }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        showToast(json.error || "AI読み取りに失敗しました", "error");
+        return;
+      }
+      const d = json.data;
+      setForm((prev) => ({
+        ...prev,
+        date: d.date ?? prev.date,
+        vendor: d.vendor ?? prev.vendor,
+        amount: d.amount != null ? String(d.amount) : prev.amount,
+        category: (CATEGORIES.includes(d.category) ? d.category : prev.category) as DocumentCategory,
+        note: d.note ?? prev.note,
+      }));
+      showToast("AI読み取り完了。内容を確認してください", "success");
+    } catch {
+      showToast("AI読み取りに失敗しました", "error");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -234,6 +272,34 @@ export default function UploadPage() {
                     <X className="w-4 h-4" />
                   </button>
                   <p className="text-xs text-brand-500/50 mt-2 text-center truncate">{fileName}</p>
+
+                  {/* AI読み取りボタン */}
+                  <button
+                    type="button"
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                    className={cn(
+                      "mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold transition-all",
+                      isAnalyzing
+                        ? "bg-sky-100 text-sky-400 cursor-not-allowed"
+                        : "bg-gradient-to-r from-sky-500 to-blue-500 text-white shadow-md shadow-sky-200 hover:shadow-lg hover:shadow-sky-300 active:scale-[0.98]"
+                    )}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        AI読み取り中...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        AIで自動読み取り
+                      </>
+                    )}
+                  </button>
+                  <p className="text-[11px] text-brand-400/50 text-center mt-1.5">
+                    日付・金額・取引先・カテゴリを自動入力します
+                  </p>
                 </div>
               ) : (
                 <div
